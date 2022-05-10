@@ -1,7 +1,7 @@
 package boot
 
 import (
-	gqaConfig "github.com/Junvary/gin-quasar-admin/GQA-BACKEND/config/config"
+	gqaConfig "github.com/Junvary/gin-quasar-admin/GQA-BACKEND/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -9,15 +9,15 @@ import (
 
 func Mysql() *gorm.DB {
 	mysqlCfg := gqaConfig.Mysql{
-		Username:     "root",
-		Password:     "123456",
-		Config:       "charset=utf8mb4&parseTime=True&loc=Local",
-		Path:         "192.168.35.166:3311",
-		DbName:       "jingjigdsystem2",
-		MaxIdleConns: 0,
-		MaxOpenConns: 0,
+		User:     "root",
+		Password: "123456",
+		Host:     "192.168.35.166",
+		Port:     "3311",
+		Database: "jingjigdsystem2",
+		MaxIdle:  0,
+		MaxOpen:  0,
 	}
-	dsn := mysqlCfg.Username + ":" + mysqlCfg.Password + "@tcp(" + mysqlCfg.Path + ")/" + mysqlCfg.DbName + "?" + mysqlCfg.Config
+	dsn := mysqlCfg.User + ":" + mysqlCfg.Password + "@tcp(" + mysqlCfg.Host + ":" + mysqlCfg.Port + ")/" + mysqlCfg.Database + "?charset=utf8mb4&parseTime=True&loc=Local"
 	mysqlConfig := mysql.Config{
 		DSN:                       dsn,   // DSN data source name
 		DefaultStringSize:         255,   // string 类型字段的默认长度
@@ -30,8 +30,8 @@ func Mysql() *gorm.DB {
 		return nil
 	} else {
 		sqlDB, _ := db.DB()
-		sqlDB.SetMaxIdleConns(mysqlCfg.MaxIdleConns)
-		sqlDB.SetMaxOpenConns(mysqlCfg.MaxOpenConns)
+		sqlDB.SetMaxIdleConns(mysqlCfg.MaxIdle)
+		sqlDB.SetMaxOpenConns(mysqlCfg.MaxOpen)
 		return db
 	}
 }

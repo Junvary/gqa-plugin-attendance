@@ -2,10 +2,10 @@ package attendance
 
 import (
 	"fmt"
-	pluginBoot "github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/boot"
-	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/boot/data"
-	pluginGlobal "github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/global"
-	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/router/private_router"
+	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/boot"
+	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/data"
+	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/global"
+	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/gqaplugin/attendance/router/privaterouter"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +25,7 @@ func (f *attendance) PluginVersion() string {
 	return "v0.0.1"
 }
 
-func (f *attendance) PluginRemark() string {
+func (f *attendance) PluginMemo() string {
 	return "这是考勤统计插件"
 }
 
@@ -33,7 +33,7 @@ func (f *attendance) PluginRouterPublic(publicGroup *gin.RouterGroup) {
 }
 
 func (f *attendance) PluginRouterPrivate(privateGroup *gin.RouterGroup) {
-	private_router.InitPrivateRouter(privateGroup)
+	privaterouter.InitPrivateRouter(privateGroup)
 }
 
 func (f *attendance) PluginMigrate() []interface{} {
@@ -43,7 +43,7 @@ func (f *attendance) PluginMigrate() []interface{} {
 func (f *attendance) PluginData() []interface{ LoadData() (err error) } {
 	var DataList = []interface{ LoadData() (err error) }{
 		data.PluginAttendanceSysApi,
-		data.PluginAttendanceSysCasbin,
+		data.PluginAttendanceSysRoleApi,
 		data.PluginAttendanceSysMenu,
 		data.PluginAttendanceSysRoleMenu,
 	}
@@ -51,8 +51,8 @@ func (f *attendance) PluginData() []interface{ LoadData() (err error) } {
 }
 
 func init() {
-	pluginGlobal.AttendanceDb = pluginBoot.Mysql()
-	if pluginGlobal.AttendanceDb != nil {
+	global.AttendanceDb = boot.Mysql()
+	if global.AttendanceDb != nil {
 		fmt.Println("插件Attendance连接数据库成功！")
 	} else {
 		fmt.Println("插件Attendance连接数据库失败！")

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/Junvary/gin-quasar-admin/GQA-BACKEND/global"
+	gqaModel "github.com/Junvary/gin-quasar-admin/GQA-BACKEND/model"
 	"time"
 )
 
@@ -47,7 +47,7 @@ type InareaWithUserinfo struct {
 }
 
 type InareaWithUserinfoDateRequest struct {
-	global.RequestPageAndSort
+	gqaModel.RequestPageAndSort
 	WorkNumber string `json:"workNumber"`
 	InAreaTime string `json:"inAreaTime"`
 	UserName   string `json:"userName"`

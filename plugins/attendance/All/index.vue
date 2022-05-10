@@ -12,12 +12,12 @@
                             </q-chip>
 
                             <span>
-                                {{showDateTime(dayList[0].inAreaTime)}}
+                                {{ showDateTime(dayList[0].inAreaTime) }}
 
                             </span>
                             <span>
-                                {{dayList[0].userName}}(
-                                {{dayList[0].workNumber}}
+                                {{ dayList[0].userName }}(
+                                {{ dayList[0].workNumber }}
                                 )
 
                             </span>
@@ -33,12 +33,12 @@
                             </q-chip>
 
                             <span>
-                                {{showDateTime(yearFirstList[0].inAreaTime)}}
+                                {{ showDateTime(yearFirstList[0].inAreaTime) }}
 
                             </span>
                             <span>
-                                {{yearFirstList[0].userName}}(
-                                {{yearFirstList[0].workNumber}}
+                                {{ yearFirstList[0].userName }}(
+                                {{ yearFirstList[0].workNumber }}
                                 )
 
                             </span>
@@ -59,7 +59,7 @@
 
                     <template v-slot:body-cell-inAreaTime="props">
                         <q-td :props="props">
-                            {{showDateTime(props.row.inAreaTime)}}
+                            {{ showDateTime(props.row.inAreaTime) }}
                         </q-td>
                     </template>
 
@@ -81,8 +81,8 @@
                     <GqaAvatar size="150px" />
                     <q-card-section class="column items-center justify-center" style="width: 100%">
                         <span>
-                            {{personFirstList[0].userName}}(
-                            {{personFirstList[0].workNumber}}
+                            {{ personFirstList[0].userName }}(
+                            {{ personFirstList[0].workNumber }}
                             )
                         </span>
                         <q-chip class="glossy" color="deep-orange" text-color="white" icon-right="star">
@@ -92,7 +92,7 @@
                             创造于：
                         </span>
                         <span>
-                            {{showDateTime(personFirstList[0].inAreaTime)}}
+                            {{ showDateTime(personFirstList[0].inAreaTime) }}
                         </span>
                     </q-card-section>
                 </q-card-section>
@@ -103,108 +103,114 @@
     </q-page>
 </template>
 
-<script>
-import { tableDataMixin } from 'src/mixins/tableDataMixin'
-import { FormatDateTime } from 'src/utils/date'
-import GqaAvatar from 'src/components/GqaAvatar'
+<script setup>
+import useTableData from 'src/composables/useTableData'
 import { postAction } from 'src/api/manage'
 import { date } from 'quasar'
+import { computed, ref, onBeforeMount } from 'vue'
 
-export default {
-    name: 'All',
-    mixins: [tableDataMixin],
-    components: {
-        GqaAvatar,
-    },
-    computed: {
-        showDateTime() {
-            return (datetime) => {
-                return FormatDateTime(datetime)
-            }
-        },
-    },
-    data() {
-        return {
-            queryParams: {
-                inAreaTime: '',
-            },
-            url: {
-                list: 'plugin-attendance/in-area-list',
-                year: 'plugin-attendance/in-area-year',
-            },
-            pagination: {
-                sortBy: 'created_at',
-                descending: true,
-                page: 1,
-                rowsPerPage: 10,
-            },
-            columns: [
-                { name: 'workNumber', align: 'center', label: '工号', field: 'workNumber' },
-                { name: 'userName', align: 'center', label: '姓名', field: 'userName' },
-                { name: 'inAreaTime', align: 'center', label: '打卡时间', field: 'inAreaTime' },
-                { name: 'actions', align: 'center', label: this.$t('Actions'), field: 'actions' },
-            ],
-            dayList: [],
-            yearFirstList: [],
-            personVisible: false,
-            personFirstList: [],
-            personLoading: false,
+const url = {
+    list: 'plugin-attendance/in-area-list',
+    year: 'plugin-attendance/in-area-year',
+}
+const columns = [
+    { name: 'workNumber', align: 'center', label: '工号', field: 'workNumber' },
+    { name: 'userName', align: 'center', label: '姓名', field: 'userName' },
+    { name: 'inAreaTime', align: 'center', label: '打卡时间', field: 'inAreaTime' },
+    { name: 'actions', align: 'center', label: '操作', field: 'actions' },
+]
+const {
+    showDateTime,
+    pagination,
+    queryParams,
+    pageOptions,
+    GqaDictShow,
+    GqaAvatar,
+    loading,
+    tableData,
+    recordDetailDialog,
+    showAddForm,
+    showEditForm,
+    onRequest,
+    handleSearch,
+    // resetSearch,
+    handleFinish,
+    handleDelete,
+} = useTableData(url)
+
+const dayList = ref([])
+const yearFirstList = ref([])
+const personVisible = ref(false)
+const personFirstList = ref([])
+const personLoading = ref(false)
+
+onBeforeMount(() => {
+    const dateNow = new Date()
+    queryParams.value.inAreaTime = date.formatDate(dateNow, 'YYYY-MM-DD')
+    pagination.value = {
+        sortBy: 'created_at',
+        descending: true,
+        page: 1,
+        rowsPerPage: 10,
+    }
+    getDayResult()
+    getYearResult()
+})
+const getDayResult = async () => {
+    dayList.value = []
+    await onRequest({
+        pagination: pagination.value,
+        queryParams: queryParams.value
+    })
+    dayList.value = tableData.value
+}
+const getYearResult = () => {
+    yearFirstList.value = []
+    postAction(url.year, {
+        workNumber: '',
+    }).then((res) => {
+        if (res.code === 1) {
+            yearFirstList.value = res.data.records
         }
-    },
-    created() {
-        const dateNow = new Date()
-        this.queryParams.inAreaTime = date.formatDate(dateNow, 'YYYY-MM-DD')
-        this.getDayResult()
-        this.getYearResult()
-    },
-    methods: {
-        async getDayResult() {
-            this.dayList = []
-            await this.getTableData()
-            this.dayList = this.tableData
-        },
-        getYearResult() {
-            this.yearFirstList = []
-            postAction(this.url.year, {
-                workNumber: '',
-            }).then((res) => {
-                if (res.code === 1) {
-                    this.yearFirstList = res.data.records
-                }
-            })
-        },
-        changeDate(value) {
-            this.pagination = {
-                sortBy: 'created_at',
-                descending: true,
-                page: 1,
-                rowsPerPage: 10,
-            }
-            this.queryParams.inAreaTime = value
-            this.getDayResult()
-        },
-        personResult(row) {
-            this.personFirstList = []
-            this.personLoading = true
-            this.personVisible = true
-            postAction(this.url.year, {
-                workNumber: row.workNumber,
-            })
-                .then((res) => {
-                    if (res.code === 1) {
-                        this.personFirstList = res.data.records
-                    }
-                })
-                .finally(() => {
-                    this.personLoading = false
-                })
-        },
-        resetSearch() {
-            this.queryParams = {}
-            const dateNow = new Date()
-            this.queryParams.inAreaTime = date.formatDate(dateNow, 'YYYY-MM-DD')
-            this.getTableData()
-        },
-    },
+    })
+}
+const changeDate = (value) => {
+    pagination.value = {
+        sortBy: 'created_at',
+        descending: true,
+        page: 1,
+        rowsPerPage: 10,
+    }
+    queryParams.value.inAreaTime = value
+    getDayResult()
+}
+const personResult = (row) => {
+    personFirstList.value = []
+    personLoading.value = true
+    personVisible.value = true
+    postAction(url.year, {
+        workNumber: row.workNumber,
+    }).then((res) => {
+        if (res.code === 1) {
+            personFirstList.value = res.data.records
+        }
+    }).finally(() => {
+        personLoading.value = false
+    })
+}
+const resetSearch = () => {
+    queryParams.value = {}
+    const dateNow = new Date()
+    pagination.value = {
+        sortBy: 'created_at',
+        descending: true,
+        page: 1,
+        rowsPerPage: 10,
+    }
+    queryParams.value.inAreaTime = date.formatDate(dateNow, 'YYYY-MM-DD')
+    onRequest({
+        pagination: pagination.value,
+        queryParams: queryParams.value
+    })
 }
 </script>
