@@ -132,6 +132,7 @@ const {
     showAddForm,
     showEditForm,
     onRequest,
+    getTableData,
     handleSearch,
     // resetSearch,
     handleFinish,
@@ -158,10 +159,7 @@ onBeforeMount(() => {
 })
 const getDayResult = async () => {
     dayList.value = []
-    await onRequest({
-        pagination: pagination.value,
-        queryParams: queryParams.value
-    })
+    await getTableData()
     dayList.value = tableData.value
 }
 const getYearResult = () => {
@@ -208,9 +206,6 @@ const resetSearch = () => {
         rowsPerPage: 10,
     }
     queryParams.value.inAreaTime = date.formatDate(dateNow, 'YYYY-MM-DD')
-    onRequest({
-        pagination: pagination.value,
-        queryParams: queryParams.value
-    })
+    getTableData()
 }
 </script>
