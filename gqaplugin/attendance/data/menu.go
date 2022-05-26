@@ -34,8 +34,8 @@ func (s *sysMenu) LoadData() error {
 var sysMenuData = []gqaModel.SysMenu{
 	{GqaModelWithCreatedByAndUpdatedBy: gqaModel.GqaModelWithCreatedByAndUpdatedBy{GqaModel: gqaGlobal.GqaModel{
 		Sort: 901, Stable: "yes", CreatedBy: "admin", CreatedAt: time.Now(), Memo: "这是考勤统计插件",
-	}}, Name: "GqaPluginAttendance", Title: "考勤统计", Icon: "house", Path: "", Component: ""},
+	}}, IsPlugin: "yes", Name: "GqaPluginAttendance", Title: "考勤统计", Icon: "house", Path: "", Component: ""},
 	{GqaModelWithCreatedByAndUpdatedBy: gqaModel.GqaModelWithCreatedByAndUpdatedBy{GqaModel: gqaGlobal.GqaModel{
 		Sort: 1, Stable: "yes", CreatedBy: "admin", CreatedAt: time.Now(), Memo: "考勤统计",
-	}}, Name: "plugin-attendance-all", Title: "考勤统计", Icon: "newspaper", Path: "/plugin-attendance/attendance/all", Component: "plugins/attendance/All/index", ParentCode: "GqaPluginAttendance"},
+	}}, IsPlugin: "yes", Name: "plugin-attendance-all", Title: "考勤统计", Icon: "newspaper", Path: "/plugin-attendance/attendance/all", Component: "plugins/attendance/All/index", ParentCode: "GqaPluginAttendance"},
 }
